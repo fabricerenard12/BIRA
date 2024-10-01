@@ -69,6 +69,8 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
     print("Intializing Network...")
 
     model = YOLO(weights)
+    # model.eval()
+    # model.to('cuda')
 
     while not exit_signal:
         if run_signal:
@@ -184,7 +186,7 @@ def object_detection(label: int, duration: int, opt):
             for obj in list:
                 print(str(obj.id) + ": "+ str(obj.raw_label))
 
-            rd.retrieve_data(objects.object_list)
+            rd.retrieve_data(list)
             # -- Display
             # Retrieve display data
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
@@ -198,10 +200,10 @@ def object_detection(label: int, duration: int, opt):
             #viewer.updateData(point_cloud_render, objects)
             # 2D rendering
             np.copyto(image_left_ocv, image_left.get_data())
-            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking)
+            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking, label)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
             # Tracking view
-            track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
+            #track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
 
             cv2.imshow("ZED | 2D View and Birds View", global_image)
             key = cv2.waitKey(10)
