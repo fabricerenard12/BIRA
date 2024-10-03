@@ -6,7 +6,9 @@ import tempfile
 from ctypes import *
 
 # Load the Whisper model once
-model = whisper.load_model("medium")
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = whisper.load_model("small", device=device)
+print(f"Model is loaded on: {device}")
 
 # Records audio directly from the microphone until the user presses Enter 
 # and then transcribes it to text using Whisper, returning that transcription.
