@@ -5,8 +5,10 @@ import argparse
 import torch
 import math
 import faulthandler
+import UART
 faulthandler.enable()
-def find_angle():
+
+def find_angle() -> int:
     x = retrieve_data.get_distance(0)
     y = retrieve_data.get_distance(1)
     z = retrieve_data.get_distance(2)
@@ -14,7 +16,7 @@ def find_angle():
 
     # Convert radians to degrees
     angle_deg = math.degrees(angle_rad)
-    print(angle_deg)
+    return angle_deg
 
 def main():
     text = record.transcribe_directly()
@@ -30,7 +32,7 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        detector.object_detection(label, 15, opt)
+        detector.object_detection(label, 25, opt)
     
 
 
@@ -39,4 +41,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    find_angle()
+    UART.send_data_through_UART(find_angle())
