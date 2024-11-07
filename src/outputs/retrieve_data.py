@@ -20,7 +20,7 @@ class ObjectOutput:
 
 
 def write_json(obj_output) : 
-    with open("data.txt", "a")  as f : 
+    with open("data.txt", "w")  as f : 
         #json.dump(obj_output.__dict__, f)
         f.write(str(obj_output.__dict__))
         f.write('\n')

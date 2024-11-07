@@ -1,29 +1,26 @@
-#import record, algorithm
+import record, algorithm
 import outputs.retrieve_data as retrieve_data
 import detector
 import argparse
 import torch
 import math
-#import faulthandler
-#faulthandler.enable()
+import faulthandler
+faulthandler.enable()
 def find_angle():
     x = retrieve_data.get_distance(0)
-    print(x)
     y = retrieve_data.get_distance(1)
     z = retrieve_data.get_distance(2)
     angle_rad = math.atan(x/z)
-    print(z)
-    print(angle_rad)
 
     # Convert radians to degrees
     angle_deg = math.degrees(angle_rad)
     print(angle_deg)
 
 def main():
-    #text = record.transcribe_directly() + " pomme "
-    #print(text)
-    #label = algorithm.stringtoLabel(text)
-    label = 0
+    text = record.transcribe_directly()
+    print(text)
+    label = algorithm.stringtoLabel(text)
+    #label = 0
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='../models/yolov8n.pt', help='model.pt path(s)') #A modifier pour changer de modele
@@ -33,7 +30,7 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        detector.object_detection(0, 5, opt)
+        detector.object_detection(label, 15, opt)
     
 
 
