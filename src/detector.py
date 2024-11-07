@@ -186,7 +186,7 @@ def object_detection(label: int, duration: int, opt):
             for obj in list:
                 print(str(obj.id) + ": "+ str(obj.raw_label))
 
-            rd.retrieve_data(list)
+            rd.retrieve_data(list, label)
             # -- Display
             # Retrieve display data
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
