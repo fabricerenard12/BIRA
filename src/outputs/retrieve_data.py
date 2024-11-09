@@ -30,6 +30,8 @@ def retrieve_data(objects, label) :
     #if len(objects.object_list) == 0 : return
     objects_out = []
     for obj in objects:    
+        print(obj.raw_label, "et",label)
+
         if obj.raw_label != label: continue
         if len(obj.bounding_box) == 0 : continue  
         if np.isnan(obj.position).any(): continue

@@ -1,4 +1,5 @@
-import record, algorithm
+import record
+import algorithm
 import outputs.retrieve_data as retrieve_data
 import detector
 import argparse
@@ -9,13 +10,14 @@ import UART
 faulthandler.enable()
 
 def find_angle() -> int:
-    x = retrieve_data.get_distance(0)
+    x = retrieve_data.get_distance(0) 
     y = retrieve_data.get_distance(1)
     z = retrieve_data.get_distance(2)
     angle_rad = math.atan(x/z)
 
     # Convert radians to degrees
     angle_deg = math.degrees(angle_rad)
+    print(angle_deg)
     return angle_deg
 
 def main():
@@ -36,9 +38,12 @@ def main():
     
 
 
-
-
-
 if __name__ == '__main__':
     main()
-    UART.send_data_through_UART(find_angle())
+    angle = find_angle()
+    UART.send_data_through_UART(-angle)
+    #UART.send_data_through_UART(input())
+    input("Press Enter to end the code...")
+    UART.send_data_through_UART(angle)
+
+

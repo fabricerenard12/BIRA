@@ -45,10 +45,9 @@ def send_data_through_UART(angle: int) -> bool:
     Returns:
         dataSuccessfullySent (bool): Result of data transmission (Successful or Unsuccessful).
     """
-    angle = int(angle+180) % 360
+    angle =  ((2*int(angle)+360) % 360 )
     assert(angle >= 0 and angle <= 360)
     serial_ports = get_serial_ports_list()
-
     if len(serial_ports) != 1:
         raise Exception("Erreur: il doit y avoir seulement un port serial connecte")
     
@@ -58,7 +57,6 @@ def send_data_through_UART(angle: int) -> bool:
     VELOCITY <<= VELOCITY_SHIFT
 
     angle <<= ANGLE_SHIFT
-
     data_successfully_sent = False
     data = 0x00000000
     data += angle
