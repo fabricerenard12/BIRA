@@ -6,7 +6,7 @@ import tempfile
 from ctypes import *
 
 # Load the Whisper model once
-model = whisper.load_model("medium")
+model = whisper.load_model("small", device="cuda")
 
 # Records audio directly from the microphone until the user presses Enter 
 # and then transcribes it to text using Whisper, returning that transcription.
@@ -68,3 +68,5 @@ def transcribe_directly():
     return str(result["text"].strip())
 
 
+if __name__ == "__main__":
+    print(transcribe_directly())

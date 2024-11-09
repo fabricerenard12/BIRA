@@ -22,6 +22,7 @@ def find_angle() -> int:
 
 def main():
     text = record.transcribe_directly()
+    # text = "personne"
     print(text)
     label = algorithm.stringtoLabel(text)
     #label = 0
@@ -41,9 +42,9 @@ def main():
 if __name__ == '__main__':
     main()
     angle = find_angle()
-    UART.send_data_through_UART(-angle)
+    # UART.send_data_through_UART(-angle)
     #UART.send_data_through_UART(input())
-    input("Press Enter to end the code...")
-    UART.send_data_through_UART(angle)
+    # input("Press Enter to end the code...")
+    # UART.send_data_through_UART(angle)
 
 
