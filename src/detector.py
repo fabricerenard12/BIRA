@@ -68,9 +68,9 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 
     print("Intializing Network...")
 
-    model = YOLO(weights)
-    model.to('cuda')
-    model.model.eval()
+    yolo = YOLO(weights)
+    yolo.model.to('cuda')
+    yolo.model.eval()
 
     while not exit_signal:
         if run_signal:
@@ -78,8 +78,7 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 
             img = cv2.cvtColor(image_net, cv2.COLOR_BGRA2RGB)
             # https://docs.ultralytics.com/modes/predict/#video-suffixes
-            det = model.predict(img, save=False, imgsz=img_size, conf=conf_thres, iou=iou_thres)[0].cpu().numpy().boxes
-            # det = model.predict(img, save=False, imgsz=img_size, conf=conf_thres, iou=iou_thres)[0].numpy().boxes
+            det = yolo.predict(img, save=False, imgsz=img_size, conf=conf_thres, iou=iou_thres)[0].cpu().numpy().boxes
 
             # ZED CustomBox format (with inverse letterboxing tf applied)
             detections = detections_to_custom_box(det, image_net)
