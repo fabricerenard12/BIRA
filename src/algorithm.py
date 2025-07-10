@@ -1,4 +1,4 @@
-from label import lab
+from label import lab, validLabel
 import string
 
 def stringtoLabel(sentence: str) -> int:
@@ -18,14 +18,22 @@ def stringtoLabel(sentence: str) -> int:
     """
     sentence = sentence.strip(string.punctuation)
     words = sentence.lower().split()  # Convert sentence to lowercase and split into words
-    
+    labels = []
     for word in words:
         # Check if the word matches any English or French value in the dictionary
         for key, values in (lab()).items():
             if word in values:
-                print(f"Key of recognized object: {key} , {lab()[key]}")
-                return key
+                if key in validLabel(True):
+                    labels.append(key)
+                    print(f"Key of recognized object: {key} , {lab()[key]}")
+
+                
+
+    if len(labels) > 1 or len(labels) == 0:  # Utilise len() pour obtenir la longueur de la liste
+        print("Erreur, il y a", len(labels), "objets.")
+        return 80
+
+
     # If no object is found, return 80
-    print("Erreur, il n'y a pas d'objet.")
-    return 80
+    return labels[0]
 
