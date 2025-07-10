@@ -1,13 +1,12 @@
 # BRAs_VoiceAndVision
-# BRAs_VoiceAndVision
 
 ## Vue d'ensemble
 
 **BRAs_VoiceAndVision** est un système d'interface avancé conçu pour un exosquelette de bras qui intègre des commandes vocales et une vision par ordinateur afin d'améliorer l'interaction et le contrôle de l'utilisateur. Ce projet utilise des technologies de pointe pour créer une expérience fluide et intuitive. Les composants principaux de ce système sont :
 
-- **pyzed** : Un wrapper Python pour la caméra stéréo ZED de Stereolabs, offrant une perception de profondeur de haute qualité et une conscience spatiale.
-- **openai-whisper** : Un puissant modèle de reconnaissance vocale développé par OpenAI, permettant une reconnaissance précise des commandes vocales.
-- **yolov8** : La dernière itération du modèle de détection d'objets YOLO (You Only Look Once), offrant des capacités de détection d'objets en temps réel et précises.
+- [**pyzed**](https://www.stereolabs.com/docs/object-detection) : Un wrapper Python pour la caméra stéréo ZED de Stereolabs, offrant une perception de profondeur de haute qualité et une conscience spatiale.
+- [**openai-whisper**](https://openai.com/index/whisper/) : Un puissant modèle de reconnaissance vocale développé par OpenAI, permettant une reconnaissance précise des commandes vocales.
+- [**yolov8**](https://yolov8.com/) : La dernière itération du modèle de détection d'objets YOLO (You Only Look Once), offrant des capacités de détection d'objets en temps réel et précises.
 
 ## Fonctionnalités
 
