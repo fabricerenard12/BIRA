@@ -75,7 +75,7 @@ def render_2D(left_display, img_scale, objects, is_tracking_on, label):
             if np.isfinite(obj.position[2]):
                 text = str(round(abs(obj.position[2]), 1)) + "M"
                 text_position = (int(position_image[0] - 20), int(position_image[1]))
-                # cv2.putText(left_display, text, text_position, cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.5, text_color, 1)
+                cv2.putText(left_display, text, text_position, cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.5, text_color, 1)
 
     # Here, overlay is as the left image, but with opaque masks on each detected objects
     cv2.addWeighted(left_display, 0.7, overlay, 0.3, 0.0, left_display)
@@ -118,7 +118,7 @@ class TrackingViewer:
     def generate_view(self, objects, current_camera_pose, tracking_view, tracking_enabled):
         # To get position in WORLD reference
         for obj in objects.object_list:
-            if obj.raw_label != 0 : continue
+            #if obj.raw_label != 0 : continue
 
             pos = obj.position
             tmp_pos = sl.Translation()
@@ -146,7 +146,7 @@ class TrackingViewer:
 
     def add_to_tracklets(self, objects, current_timestamp):
         for obj in objects.object_list:
-            if obj.raw_label != 0 : continue
+            #if obj.raw_label != 0 : continue
             if (obj.tracking_state != sl.OBJECT_TRACKING_STATE.OK) or (not np.isfinite(obj.position[0])) or (
                     obj.id < 0):
                 continue

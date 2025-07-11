@@ -183,10 +183,12 @@ def object_detection(label: int, duration: int, opt):
             zed.retrieve_objects(objects, obj_runtime_param)
 
             list = [x for x in objects.object_list if (x.raw_label == label)]
-            for obj in list:
+            for obj in objects.object_list:
+                if (obj.raw_label != label) : continue
                 print(str(obj.id) + ": "+ str(obj.raw_label))
 
             rd.retrieve_data(list, label)
+            
             # -- Display
             # Retrieve display data
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
