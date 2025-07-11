@@ -6,7 +6,8 @@ Merci de votre intérêt pour contribuer à ce projet ! Afin de garantir une col
 
 1. **Respect des conventions de nommage** :
     - Utilisez des noms de variables et de fonctions clairs et explicites.
-    - Suivez le style camelCase pour les noms de variables et de fonctions (ex. : `maVariable`, `maFonction`).
+    - Suivez le style Snake Case pour les noms de variables et de fonctions (ex. : `ma_variable`, `ma_fonction`).
+    - Utilisez le style Screaming Snake Case pour les noms de constantes (ex. :  'MA_CONSTANTE').
     - Utilisez PascalCase pour les classes (ex. : `MaClasse`).
 
 2. **Indentation et formatage** :
@@ -15,11 +16,7 @@ Merci de votre intérêt pour contribuer à ce projet ! Afin de garantir une col
 
 3. **Commentaires** :
     - Ajoutez des commentaires clairs pour expliquer les parties complexes du code.
-    - Utilisez des commentaires en anglais selon la langue principale du projet.
-
-4. **Tests** :
-    - Écrivez des tests unitaires pour toute nouvelle fonctionnalité.
-    - Assurez-vous que tous les tests passent avant de soumettre votre code.
+    - Utilisez des commentaires en anglais.
 
 ## Règles de Contribution
 
@@ -34,12 +31,6 @@ Merci de votre intérêt pour contribuer à ce projet ! Afin de garantir une col
 
 3. **Respect des délais** :
     - Essayez de respecter les délais convenus pour les contributions.
-
-## Code de Conduite
-
-- Soyez respectueux envers les autres contributeurs.
-- Évitez tout comportement discriminatoire ou offensant.
-- Favorisez une communication claire et constructive.
 
 ## Ressources
 

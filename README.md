@@ -23,7 +23,7 @@ Assurez-vous d'avoir les exigences logicielles et matérielles suivantes :
 - GPU compatible pour YOLOv8 et OpenAI Whisper
 - Bibliothèques Python requises
 
-## Installation ** METTRE À JOUR **
+## Installation ** À METTRE À JOUR **
 
 ### 1. Clonez le Répertoire
 
