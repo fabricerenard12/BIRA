@@ -1,4 +1,6 @@
+from scipy.stats import trim_mean
 import speech_to_text
+import numpy as np
 import algorithm
 import outputs.retrieve_data as retrieve_data
 import detector
@@ -7,13 +9,15 @@ import torch
 import math
 import faulthandler
 import UART
+
 faulthandler.enable()
 
-def find_angle() -> int:
-    x = retrieve_data.get_distance(0) 
-    y = retrieve_data.get_distance(1)
-    z = retrieve_data.get_distance(2)
-    angle_rad = math.atan(x/z)
+def find_angle(coordinated_target_list:np.ndarray) -> int:
+
+    x = trim_mean(coordinated_target_list[:,0], proportioncut=0.1)
+    z = trim_mean(coordinated_target_list[:,2], proportioncut=0.1)
+
+    angle_rad = math.atan(x / z)
 
     # Convert radians to degrees
     angle_deg = math.degrees(angle_rad)

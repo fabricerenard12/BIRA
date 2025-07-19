@@ -19,15 +19,18 @@ class ObjectOutput:
     dimensions: list # [width, height, length]
 
 
-def write_json(obj_output) : 
-    with open("data.txt", "w")  as f :
+def write_json(obj_output) :
+    with open("history.txt", "w")  as f :
         f.write(str(obj_output.__dict__))
         f.write('\n')
         f.close()
 
 def write_history(objects, label) :
+
     objects_out = []
-    for obj in objects:    
+
+    for obj in objects:
+
         print(obj.raw_label, "et",label)
 
         if obj.raw_label != label: continue
@@ -44,21 +47,24 @@ def write_history(objects, label) :
         objects_out.append(obj_output)  
     
     objs_output = ObjectsOutput(nObjects=len(objects), objects=objects_out) 
-    write_json(objs_output)  
-
+    write_json(objs_output)
 
 def get_z_values(n:int):
+
     # Liste pour stocker les valeurs z
     z_values = []
     
     # Ouvre le fichier en mode lecture
-    with open("data.txt", "r") as f: 
+    with open("history.txt", "r") as f:
+
         for line in f:
+
             line = line.replace("ObjectOutput(", "{").replace(")", "}")
-            line = line.replace("label=", "'label':").replace("position=", "'position':").replace("dimensions=", "'dimensions':")
+            line = line.replace("label=", "'label':").replace("position=",
+                                    "'position':").replace("dimensions=", "'dimensions':")
+
             if '}{' in line:  # Si il y a plusieurs objets dans une ligne
                 line = line.replace('}{', '},{')  # Ajouter une virgule entre les objets
-                
 
             # Convertir la ligne en dictionnaire
             data_list = ast.literal_eval(line.strip())
@@ -97,8 +103,8 @@ def get_distance(n:int):
         
     if len(true_z_values) == 0:  # Vérifier si la liste z_values est vide
         return None
+
     true_average = sum(true_z_values) / len(true_z_values)
     print("x" if n == 0 else "y" if n == 1 else "z" if n == 2 else "error")
-    return true_average
 
-        
+    return true_average

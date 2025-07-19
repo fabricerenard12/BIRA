@@ -1,4 +1,5 @@
 from label import lab, validLabel
+
 import string
 
 def string_to_label(sentence: str) -> int:

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
+from ultralytics import YOLO
+from threading import Lock, Thread
+from scipy.stats import trim_mean
+
+import argparse
 import sys
 import numpy as np
 
-import argparse
 import torch
 import cv2
 import pyzed.sl as sl
-from ultralytics import YOLO
 
-from threading import Lock, Thread
 import time
 
 import ogl_viewer.viewer as gl
@@ -89,6 +91,7 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 
 
 def object_detection(label: int, duration: int, opt):
+
     global image_net, exit_signal, run_signal, detections
 
     capture_thread = Thread(target=torch_thread, kwargs={'weights': opt.weights,
@@ -171,7 +174,10 @@ def object_detection(label: int, duration: int, opt):
     # Set-up Timer
     timeout = time.time() + duration
 
+    coordinated_target_list = np.array([])
+
     while viewer.is_available() and not exit_signal:
+
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
 
             # -- Get the image
@@ -194,13 +200,14 @@ def object_detection(label: int, duration: int, opt):
 
             zed.retrieve_objects(objects, obj_runtime_param)
 
-            list = [x for x in objects.object_list if (x.raw_label == label)]
+            targeted_objects = [x for x in objects.object_list if (x.raw_label == label)]
 
             for obj in objects.object_list:
                 if (obj.raw_label != label) : continue
+                np.append(coordinated_target_list, np.array(obj.position))
                 print(str(obj.id) + ": "+ str(obj.raw_label))
 
-            rd.write_history(list, label)
+            rd.write_history(targeted_objects, label)
             
             # -- Display
             # Retrieve display data
@@ -238,6 +245,8 @@ def object_detection(label: int, duration: int, opt):
     exit_signal = True
     zed.disable_object_detection()
     zed.close()
+
+    return coordinated_target_list
 
 def exec_detection(label: str,  opt, duration: int=15):
     object_detection(lab.get_label_id(label), duration, opt)
