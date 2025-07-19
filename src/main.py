@@ -1,4 +1,4 @@
-import record
+import speech_to_text
 import algorithm
 import outputs.retrieve_data as retrieve_data
 import detector
@@ -24,7 +24,7 @@ def main():
     text = record.transcribe_directly()
     # text = "personne"
     print(text)
-    label = algorithm.stringtoLabel(text)
+    label = algorithm.string_to_label(text)
     #label = 0
 
     parser = argparse.ArgumentParser()

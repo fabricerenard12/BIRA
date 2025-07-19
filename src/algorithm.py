@@ -1,7 +1,7 @@
 from label import lab, validLabel
 import string
 
-def stringtoLabel(sentence: str) -> int:
+def string_to_label(sentence: str) -> int:
     """
     Converts a sentence into a label based on predefined English or French values.
 
