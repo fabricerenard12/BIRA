@@ -78,7 +78,8 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 
             img = cv2.cvtColor(image_net, cv2.COLOR_BGRA2RGB)
             # https://docs.ultralytics.com/modes/predict/#video-suffixes
-            det = yolo.predict(img, save=False, imgsz=img_size, conf=conf_thres, iou=iou_thres)[0].cpu().numpy().boxes
+            det = yolo.predict(img, save=False, imgsz=img_size, conf=conf_thres,
+                               iou=iou_thres)[0].cpu().numpy().boxes
 
             # ZED CustomBox format (with inverse letterboxing tf applied)
             detections = detections_to_custom_box(det, image_net)
@@ -90,7 +91,9 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 def object_detection(label: int, duration: int, opt):
     global image_net, exit_signal, run_signal, detections
 
-    capture_thread = Thread(target=torch_thread, kwargs={'weights': opt.weights, 'img_size': opt.img_size, "conf_thres": opt.conf_thres})
+    capture_thread = Thread(target=torch_thread, kwargs={'weights': opt.weights,
+                                                         'img_size': opt.img_size,
+                                                         "conf_thres": opt.conf_thres})
     capture_thread.start()
     print("Initializing Camera...")
 
@@ -100,10 +103,10 @@ def object_detection(label: int, duration: int, opt):
     if opt.svo is not None:
         input_type.set_from_svo_file(opt.svo)
 
-    # Create a InitParameters object and set configuration parameters
+    # Create an InitParameters object and set the configuration parameters
     init_params = sl.InitParameters(input_t=input_type, svo_real_time_mode=True)
     init_params.coordinate_units = sl.UNIT.METER
-    init_params.depth_mode = sl.DEPTH_MODE.ULTRA  # QUALITY
+    init_params.depth_mode = sl.DEPTH_MODE.ULTRA
     init_params.coordinate_system = sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP
     init_params.depth_maximum_distance = 3
     init_params.camera_fps = 60
@@ -120,7 +123,8 @@ def object_detection(label: int, duration: int, opt):
     print("Initialized Camera")
 
     positional_tracking_parameters = sl.PositionalTrackingParameters()
-    # If the camera is static, uncomment the following line to have better performances and boxes sticked to the ground.
+    # If the camera is static, uncomment the following line to have better performances
+    # and boxes sticked to the ground.
     # positional_tracking_parameters.set_as_static = True
     zed.enable_positional_tracking(positional_tracking_parameters)
 
@@ -135,24 +139,32 @@ def object_detection(label: int, duration: int, opt):
     # Display
     camera_infos = zed.get_camera_information()
     camera_res = camera_infos.camera_configuration.resolution
+
     # Create OpenGL viewer
     viewer = gl.GLViewer()
     point_cloud_res = sl.Resolution(min(camera_res.width, 720), min(camera_res.height, 404))
     point_cloud_render = sl.Mat()
     viewer.init(camera_infos.camera_model, point_cloud_res, obj_param.enable_tracking)
-    point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4, sl.MEM.CPU)
+    point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4,
+                         sl.MEM.CPU)
     image_left = sl.Mat()
+
     # Utilities for 2D display
     display_resolution = sl.Resolution(min(camera_res.width, 1280), min(camera_res.height, 720))
-    image_scale = [display_resolution.width / camera_res.width, display_resolution.height / camera_res.height]
-    image_left_ocv = np.full((display_resolution.height, display_resolution.width, 4), [245, 239, 239, 255], np.uint8)
+    image_scale = [display_resolution.width / camera_res.width,
+                   display_resolution.height / camera_res.height]
+    image_left_ocv = np.full((display_resolution.height, display_resolution.width, 4),
+                             [245, 239, 239, 255], np.uint8)
 
     # Utilities for tracks view
     camera_config = camera_infos.camera_configuration
     tracks_resolution = sl.Resolution(400, display_resolution.height)
-    track_view_generator = cv_viewer.TrackingViewer(tracks_resolution, camera_config.fps, init_params.depth_maximum_distance)
+    track_view_generator = cv_viewer.TrackingViewer(tracks_resolution, camera_config.fps,
+                                                    init_params.depth_maximum_distance)
     track_view_generator.set_camera_calibration(camera_config.calibration_parameters)
-    image_track_ocv = np.zeros((tracks_resolution.height, tracks_resolution.width, 4), np.uint8)
+    image_track_ocv = np.zeros((tracks_resolution.height, tracks_resolution.width, 4),
+                               np.uint8)
+
     # Camera pose
     cam_w_pose = sl.Pose()
     
@@ -161,10 +173,9 @@ def object_detection(label: int, duration: int, opt):
 
     while viewer.is_available() and not exit_signal:
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
+
             # -- Get the image
             lock.acquire()
-            
-
             zed.retrieve_image(image_left_tmp, sl.VIEW.LEFT)
             image_net = image_left_tmp.get_data()
             lock.release()
@@ -176,6 +187,7 @@ def object_detection(label: int, duration: int, opt):
 
             # Wait for detections
             lock.acquire()
+
             # -- Ingest detections
             zed.ingest_custom_box_objects(detections)
             lock.release()
@@ -183,11 +195,12 @@ def object_detection(label: int, duration: int, opt):
             zed.retrieve_objects(objects, obj_runtime_param)
 
             list = [x for x in objects.object_list if (x.raw_label == label)]
+
             for obj in objects.object_list:
                 if (obj.raw_label != label) : continue
                 print(str(obj.id) + ": "+ str(obj.raw_label))
 
-            rd.retrieve_data(list, label)
+            rd.write_history(list, label)
             
             # -- Display
             # Retrieve display data
@@ -196,19 +209,22 @@ def object_detection(label: int, duration: int, opt):
             zed.retrieve_image(image_left, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
             zed.get_position(cam_w_pose, sl.REFERENCE_FRAME.WORLD)
 
-
-
             # 3D rendering
             #viewer.updateData(point_cloud_render, objects)
+
             # 2D rendering
             np.copyto(image_left_ocv, image_left.get_data())
-            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking, label)
+            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking,
+                                label)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
+
             # Tracking view
-            #track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv, objects.is_tracked)
+            #track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv,
+            # objects.is_tracked)
 
             cv2.imshow("ZED | 2D View and Birds View", global_image)
             key = cv2.waitKey(10)
+
             if key == 27 :
                 exit_signal = True
             elif time.time() > timeout:

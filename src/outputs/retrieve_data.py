@@ -20,14 +20,12 @@ class ObjectOutput:
 
 
 def write_json(obj_output) : 
-    with open("data.txt", "w")  as f : 
-        #json.dump(obj_output.__dict__, f)
+    with open("data.txt", "w")  as f :
         f.write(str(obj_output.__dict__))
         f.write('\n')
         f.close()
 
-def retrieve_data(objects, label) : 
-    #if len(objects.object_list) == 0 : return
+def write_history(objects, label) :
     objects_out = []
     for obj in objects:    
         print(obj.raw_label, "et",label)
@@ -62,20 +60,24 @@ def get_z_values(n:int):
                 line = line.replace('}{', '},{')  # Ajouter une virgule entre les objets
                 
 
-                # Convertir la ligne en dictionnaire
+            # Convertir la ligne en dictionnaire
             data_list = ast.literal_eval(line.strip())
             
             if isinstance(data_list, list):
-                for data in data_list:                        # Vérifier si le nombre d'objets est supérieur à 0
+                for data in data_list:
+
+                    # Vérifier si le nombre d'objets est supérieur à 0
                     if isinstance(data, dict) and 'nObjects' in data and data['nObjects'] > 0:
                         # Récupérer les objets
                         objects = data['objects']
                         for obj in objects:
-                            # Récupérer la position et la valeur z                                position = obj['position']
+
+                            # Récupérer la position et la valeur z
+                            # position = obj['position']
                             z = position[n] 
                             z_values.append(z)
             else:
-                    # Si le résultat n'est pas une liste, traiter comme un seul dictionnaire
+                # Si le résultat n'est pas une liste, traiter comme un seul dictionnaire
                 if isinstance(data_list, dict) and 'nObjects' in data_list and data_list['nObjects'] > 0:
                     objects = data_list['objects']
                     for obj in objects:
