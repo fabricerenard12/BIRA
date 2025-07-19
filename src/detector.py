@@ -18,6 +18,7 @@ import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
 import outputs.retrieve_data as rd
+from algorithm import string_to_label 
 
 lock = Lock()
 run_signal = False
@@ -174,8 +175,7 @@ def object_detection(label: int, duration: int, opt):
     # Set-up Timer
     timeout = time.time() + duration
 
-    coordinated_target_list = np.array([])
-
+    coordinated_target_list = np.empty((0,3))
     while viewer.is_available() and not exit_signal:
 
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
@@ -200,12 +200,15 @@ def object_detection(label: int, duration: int, opt):
 
             zed.retrieve_objects(objects, obj_runtime_param)
 
-            targeted_objects = [x for x in objects.object_list if (x.raw_label == label)]
+            print("label=", label)
+            print("object_list=", str(objects.object_list))
+            targeted_objects = [x for x in objects.object_list if (True)]
+            print("targeted_objects", targeted_objects)
 
-            for obj in objects.object_list:
-                if (obj.raw_label != label) : continue
-                np.append(coordinated_target_list, np.array(obj.position))
+            for obj in targeted_objects:
+                print("position=", str(obj.position))
                 print(str(obj.id) + ": "+ str(obj.raw_label))
+                coordinated_target_list = np.vstack([coordinated_target_list, np.array(list(obj.position))])
 
             rd.write_history(targeted_objects, label)
             
@@ -246,6 +249,9 @@ def object_detection(label: int, duration: int, opt):
     zed.disable_object_detection()
     zed.close()
 
+    coordinated_target_list = coordinated_target_list[~np.isnan(coordinated_target_list.any(axis=1))]
+    print("coordinated_target_list ", coordinated_target_list.shape)
+    print(coordinated_target_list)
     return coordinated_target_list
 
 def exec_detection(label: str,  opt, duration: int=15):

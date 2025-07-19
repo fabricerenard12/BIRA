@@ -108,3 +108,18 @@ def get_distance(n:int):
     print("x" if n == 0 else "y" if n == 1 else "z" if n == 2 else "error")
 
     return true_average
+
+def get_distance2(z_values):
+    first_average = sum(z_values) / len(z_values)
+    true_z_values = []
+    for val in z_values:
+        if (val < first_average + 0.3) and (val > first_average - 0.3):
+            true_z_values.append(val)
+        
+    if len(true_z_values) == 0:  # Vérifier si la liste z_values est vide
+        return None
+
+    true_average = sum(true_z_values) / len(true_z_values)
+
+    return true_average
+
