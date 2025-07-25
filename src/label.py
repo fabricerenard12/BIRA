@@ -1,5 +1,6 @@
-def lab():
+HOLDABLE_OBJECT_LABELS = [24,26,27,29,32,35,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,58,62,64,65,66,67,73,74,75,76,77,79]
 
+def lab():
     return {
     0: ('personne', 'person'),
     1: ('bicycle', 'bicyclette'),
@@ -82,10 +83,3 @@ def lab():
     78: ('hair drier', 'sèche-cheveux'),
     79: ('toothbrush', 'brosse à dents')
 }
-
-def validLabel(bool: True):
-    #A reconnaitre pendant la computer vision:
-    #Necessaire pour la reconnaissance vocale:
-    if bool: return [24,26,27,29,32,35,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,58,62,64,65,66,67,73,74,75,76,77,79]
-    return [0,1,2,3,4,5,6,7,8,9,10,11,11,12,13,14,15,16,17,18,19,20,21,22,23,25,28,30,31,33,34,36,37,38,56,57,59,60,61,63,68,69,70,71,72,78]
-

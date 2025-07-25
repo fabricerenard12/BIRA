@@ -200,17 +200,14 @@ def object_detection(label: int, duration: int, opt):
 
             zed.retrieve_objects(objects, obj_runtime_param)
 
-            print("label=", label)
-            print("object_list=", str(objects.object_list))
-            targeted_objects = [x for x in objects.object_list if (True)]
-            print("targeted_objects", targeted_objects)
-
-            for obj in targeted_objects:
-                print("position=", str(obj.position))
-                print(str(obj.id) + ": "+ str(obj.raw_label))
+            object_list = objects.object_list
+            for obj in object_list:
+                if obj.raw_label != label: continue
+                if len(obj.bounding_box) == 0 : continue  
+                if np.isnan(obj.position).any(): continue
                 coordinated_target_list = np.vstack([coordinated_target_list, np.array(list(obj.position))])
 
-            rd.write_history(targeted_objects, label)
+            rd.write_history(object_list, label)
             
             # -- Display
             # Retrieve display data
@@ -219,9 +216,6 @@ def object_detection(label: int, duration: int, opt):
             zed.retrieve_image(image_left, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
             zed.get_position(cam_w_pose, sl.REFERENCE_FRAME.WORLD)
 
-            # 3D rendering
-            #viewer.updateData(point_cloud_render, objects)
-
             # 2D rendering
             np.copyto(image_left_ocv, image_left.get_data())
             cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking,
@@ -229,7 +223,7 @@ def object_detection(label: int, duration: int, opt):
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
 
             # Tracking view
-            #track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv,
+            # track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv,
             # objects.is_tracked)
 
             cv2.imshow("ZED | 2D View and Birds View", global_image)
@@ -249,9 +243,6 @@ def object_detection(label: int, duration: int, opt):
     zed.disable_object_detection()
     zed.close()
 
-    coordinated_target_list = coordinated_target_list[~np.isnan(coordinated_target_list.any(axis=1))]
-    print("coordinated_target_list ", coordinated_target_list.shape)
-    print(coordinated_target_list)
     return coordinated_target_list
 
 def exec_detection(label: str,  opt, duration: int=15):
