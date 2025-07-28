@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 
+from ultralytics import YOLO
+from threading import Lock, Thread
+from scipy.stats import trim_mean
+
+import argparse
 import sys
 import numpy as np
 
-import argparse
 import torch
 import cv2
 import pyzed.sl as sl
-from ultralytics import YOLO
 
-from threading import Lock, Thread
 import time
 
 import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
 import outputs.retrieve_data as rd
+from algorithm import string_to_label 
 
 lock = Lock()
 run_signal = False
@@ -89,6 +92,7 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
 
 
 def object_detection(label: int, duration: int, opt):
+
     global image_net, exit_signal, run_signal, detections
 
     capture_thread = Thread(target=torch_thread, kwargs={'weights': opt.weights,
@@ -171,7 +175,9 @@ def object_detection(label: int, duration: int, opt):
     # Set-up Timer
     timeout = time.time() + duration
 
+    coordinated_target_list = np.empty((0,3))
     while viewer.is_available() and not exit_signal:
+
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
 
             # -- Get the image
@@ -194,13 +200,14 @@ def object_detection(label: int, duration: int, opt):
 
             zed.retrieve_objects(objects, obj_runtime_param)
 
-            list = [x for x in objects.object_list if (x.raw_label == label)]
+            object_list = objects.object_list
+            for obj in object_list:
+                if obj.raw_label != label: continue
+                if len(obj.bounding_box) == 0 : continue  
+                if np.isnan(obj.position).any(): continue
+                coordinated_target_list = np.vstack([coordinated_target_list, np.array(list(obj.position))])
 
-            for obj in objects.object_list:
-                if (obj.raw_label != label) : continue
-                print(str(obj.id) + ": "+ str(obj.raw_label))
-
-            rd.write_history(list, label)
+            rd.write_history(object_list, label)
             
             # -- Display
             # Retrieve display data
@@ -209,9 +216,6 @@ def object_detection(label: int, duration: int, opt):
             zed.retrieve_image(image_left, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
             zed.get_position(cam_w_pose, sl.REFERENCE_FRAME.WORLD)
 
-            # 3D rendering
-            #viewer.updateData(point_cloud_render, objects)
-
             # 2D rendering
             np.copyto(image_left_ocv, image_left.get_data())
             cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking,
@@ -219,7 +223,7 @@ def object_detection(label: int, duration: int, opt):
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
 
             # Tracking view
-            #track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv,
+            # track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv,
             # objects.is_tracked)
 
             cv2.imshow("ZED | 2D View and Birds View", global_image)
@@ -238,6 +242,8 @@ def object_detection(label: int, duration: int, opt):
     exit_signal = True
     zed.disable_object_detection()
     zed.close()
+
+    return coordinated_target_list
 
 def exec_detection(label: str,  opt, duration: int=15):
     object_detection(lab.get_label_id(label), duration, opt)
