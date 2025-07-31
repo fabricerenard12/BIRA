@@ -1967,7 +1967,7 @@ optree = ["optree (>=0.9.1)"]
 
 [package.source]
 type = "file"
-url = "../../Downloads/torch-2.3.0-cp310-cp310-linux_aarch64.whl"
+url = "wheels/torch-2.3.0-cp310-cp310-linux_aarch64.whl"
 
 [[package]]
 name = "torchvision"
@@ -1990,7 +1990,7 @@ scipy = ["scipy"]
 
 [package.source]
 type = "file"
-url = "../../Downloads/torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl"
+url = "wheels/torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl"
 
 [[package]]
 name = "tqdm"
@@ -2157,4 +2157,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "62b6a2039123aca76551eca7f0164e1ea94913cfa0b0d6ef2f88057b22b37ece"
+content-hash = "1009b93da788d651937976557ba21fda2d2db407ce069372c1f0a01696251587"
