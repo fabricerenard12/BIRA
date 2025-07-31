@@ -1,3 +1,33 @@
+#from label import lab
+
+import string
+
+def string_to_label(sentence: str) -> int:
+    """
+    Converts a sentence into a label based on predefined English or French values.
+
+    Args:
+        sentence (str): The input sentence to be processed and analyzed.
+
+    Returns:
+        int: The key corresponding to the recognized object, or 80 if no match is found.
+    """
+    sentence = sentence.strip(string.punctuation)
+    words = sentence.lower().split()
+    labels = []
+
+    for word in words:
+        for key, values in (lab()).items():
+            if word in values:
+                labels.append(key)
+                print(f"Key of recognized object: {key} , {lab()[key]}")
+
+    if len(labels) != 1:
+        print("Erreur, il y a", len(labels), "objets.")
+        return 80
+
+    return labels[0]
+
 HOLDABLE_OBJECT_LABELS = [24,26,27,29,32,35,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,58,62,64,65,66,67,73,74,75,76,77,79]
 
 def lab():
@@ -83,3 +113,4 @@ def lab():
     78: ('hair drier', 'sèche-cheveux'),
     79: ('toothbrush', 'brosse à dents')
 }
+
