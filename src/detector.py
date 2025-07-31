@@ -91,7 +91,7 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
         time.sleep(0.01)
 
 
-def object_detection(label: int, duration: int, opt):
+def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) -> dict:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -204,6 +204,7 @@ def object_detection(label: int, duration: int, opt):
             for obj in object_list:
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
+                if obj.position[2] > max_distance: continue  # Filter outliers by distance. Default is 7m
                 if obj.raw_label not in coordinated_target_dict:
                     coordinated_target_dict[obj.raw_label] = np.empty((0,3))
                 coordinated_target_dict[obj.raw_label] = np.vstack([coordinated_target_dict[obj.raw_label], np.array(list(obj.position))])
