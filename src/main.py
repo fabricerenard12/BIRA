@@ -1,8 +1,8 @@
 from scipy.stats import trim_mean
-#import speech_to_text
+import speech_to_text
 import numpy as np
 import utils
-import BRAs_VoiceAndVision.src.history as history
+import history as history
 import detector
 import argparse
 import torch

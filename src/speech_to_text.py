@@ -70,3 +70,4 @@ def transcribe_directly():
 
 if __name__ == "__main__":
     print(transcribe_directly())
+    

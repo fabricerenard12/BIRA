@@ -17,7 +17,7 @@ import time
 import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
-import BRAs_VoiceAndVision.src.history as rd
+import history as rd
 from utils import string_to_label 
 
 lock = Lock()
