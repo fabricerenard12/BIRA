@@ -44,8 +44,8 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        coordinated_target_dict = detector.object_detection(label, 25, opt)
-        angle = find_angle(coordinated_target_dict[label])
+        coordinate_dict = detector.object_detection(label, 25, opt)
+        angle = find_angle(coordinate_dict.get(label, np.empty((0, 3))))
         print("angle :", angle)
 
 if __name__ == '__main__':

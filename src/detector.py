@@ -175,7 +175,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) 
     # Set-up Timer
     timeout = time.time() + duration
 
-    coordinated_target_dict = dict()
+    coordinate_dict = {}
     while viewer.is_available() and not exit_signal:
 
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
@@ -204,10 +204,10 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) 
             for obj in object_list:
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
-                if obj.position[2] > max_distance: continue  # Filter outliers by distance. Default is 7m
-                if obj.raw_label not in coordinated_target_dict:
-                    coordinated_target_dict[obj.raw_label] = np.empty((0,3))
-                coordinated_target_dict[obj.raw_label] = np.vstack([coordinated_target_dict[obj.raw_label], np.array(list(obj.position))])
+                if obj.position[2] > max_distance: continue  # Filter outliers by distance.
+                if obj.raw_label not in coordinate_dict:
+                    coordinate_dict[obj.raw_label] = np.empty((0,3))
+                coordinate_dict[obj.raw_label] = np.vstack([coordinate_dict[obj.raw_label], np.array(list(obj.position))])
 
             rd.write_history(object_list, label)
             
@@ -245,7 +245,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) 
     zed.disable_object_detection()
     zed.close()
 
-    return coordinated_target_dict
+    return coordinate_dict
 
 def exec_detection(label: str,  opt, duration: int=15):
     object_detection(lab.get_label_id(label), duration, opt)
