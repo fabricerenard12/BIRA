@@ -62,4 +62,3 @@ def get_distance(z_values):
 
     true_average = sum(true_z_values) / len(true_z_values)
     return true_average
-
