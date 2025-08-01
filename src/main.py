@@ -8,7 +8,7 @@ import argparse
 import torch
 import math
 import faulthandler
-import uart
+import BRAs_VoiceAndVision.src.tempfile as tempfile
 from enum import Enum
 
 faulthandler.enable()
