@@ -90,8 +90,27 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
             run_signal = False
         time.sleep(0.01)
 
+def find_closest_object(new_position, label_type, coordinate_dict, label_to_ids, threshold):
+        """Find the id of closest existing object of the same label within threshold distance"""
+        if label_type not in label_to_ids:
+            return None
+        
+        min_distance = float('inf')
+        closest_obj_id = None
+        
+        for obj_id in label_to_ids[label_type]:
+            if obj_id in coordinate_dict and len(coordinate_dict[obj_id]) > 0:
+                # Get the most recent position of this object
+                last_position = coordinate_dict[obj_id][-1]
+                distance = np.linalg.norm(new_position - last_position)
+                
+                if distance < min_distance and distance <= threshold:
+                    min_distance = distance
+                    closest_obj_id = obj_id
+        
+        return closest_obj_id
 
-def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) -> dict:
+def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, proximity_threshold: float = 0.3) -> tuple[dict, dict]:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -176,6 +195,8 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) 
     timeout = time.time() + duration
 
     coordinate_dict = {}
+    label_to_ids = {}
+    next_object_id = 0  # Counter for generating unique object IDs
     while viewer.is_available() and not exit_signal:
 
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
@@ -205,9 +226,27 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) 
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
                 if obj.position[2] > max_distance: continue  # Filter outliers by distance.
-                if obj.raw_label not in coordinate_dict:
-                    coordinate_dict[obj.raw_label] = np.empty((0,3))
-                coordinate_dict[obj.raw_label] = np.vstack([coordinate_dict[obj.raw_label], np.array(list(obj.position))])
+                
+                current_position = np.array(list(obj.position))
+                
+                # Try to find an existing object of the same label within proximity threshold
+                closest_obj_id = find_closest_object(current_position, obj.raw_label, 
+                                                   coordinate_dict, label_to_ids, proximity_threshold)
+                
+                if closest_obj_id is not None:
+                    obj_id = closest_obj_id # Add to existing object
+                else:
+                    obj_id = next_object_id # Create new object with unique ID
+                    next_object_id += 1
+                    coordinate_dict[obj_id] = np.empty((0,3))
+                    
+                    # Track which IDs belong to which labels
+                    if obj.raw_label not in label_to_ids:
+                        label_to_ids[obj.raw_label] = set()
+                    label_to_ids[obj.raw_label].add(obj_id)
+                
+                # Add the position to the object's coordinate history
+                coordinate_dict[obj_id] = np.vstack([coordinate_dict[obj_id], current_position])
 
             rd.write_history(object_list, label)
             
@@ -245,7 +284,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) 
     zed.disable_object_detection()
     zed.close()
 
-    return coordinate_dict
+    return coordinate_dict, label_to_ids
 
 def exec_detection(label: str,  opt, duration: int=15):
     object_detection(lab.get_label_id(label), duration, opt)
