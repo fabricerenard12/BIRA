@@ -1,7 +1,6 @@
 HOLDABLE_OBJECT_LABELS = [24,26,27,29,32,35,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,58,62,64,65,66,67,73,74,75,76,77,79]
 
-def lab():
-    return {
+LAB={
     0: ('personne', 'person'),
     1: ('bicycle', 'bicyclette'),
     2: ('car', 'voiture'),
