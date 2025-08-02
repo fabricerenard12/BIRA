@@ -1,13 +1,21 @@
 from dataclasses import dataclass
-import cv_viewer.labels as labels
 import json
+import sys
 import numpy as np
 import ast
 from datetime import datetime
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from cv_viewer import labels
+
+root = Path(__file__).resolve().parents[1]
+target = root / "logs"
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+filename = target / f"{timestamp}_history.txt"
 
 @dataclass
 class ObjectsOutput:
-    nObjects: str
+    nObjects: str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
     objects: list
 
 @dataclass
@@ -16,9 +24,9 @@ class ObjectOutput:
     position: list # [x, y, z]
     dimensions: list # [width, height, length]
 
-name = str(datetime.now()) + "_history.txt"
 def write_json(obj_output) :
-    with open(name, "a")  as f :
+    target.mkdir(parents = True, exist_ok = True)
+    with open(filename, "a") as f:
         f.write(str(obj_output.__dict__))
         f.write('\n')
         f.close()
