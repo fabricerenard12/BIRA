@@ -44,9 +44,12 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        coordinated_target_list = detector.object_detection(label, 25, opt)
-        angle = find_angle(coordinated_target_list)
-        print("angle :", angle)
+        coordinate_dict = detector.object_detection(label, 25, opt)
+        if label not in coordinate_dict:
+            raise ValueError(f"Label {label} not found in coordinate dictionary.")
+        else:
+            angle = find_angle(coordinate_dict.get(label, np.empty((0, 3))))
+            print("angle :", angle)
 
 if __name__ == '__main__':
     main()

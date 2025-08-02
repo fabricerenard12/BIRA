@@ -91,7 +91,7 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
         time.sleep(0.01)
 
 
-def object_detection(label: int, duration: int, opt):
+def object_detection(label: int, duration: int, opt, max_distance: float = 7.0) -> dict:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -175,7 +175,7 @@ def object_detection(label: int, duration: int, opt):
     # Set-up Timer
     timeout = time.time() + duration
 
-    coordinated_target_list = np.empty((0,3))
+    coordinate_dict = {}
     while viewer.is_available() and not exit_signal:
 
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
@@ -202,10 +202,12 @@ def object_detection(label: int, duration: int, opt):
 
             object_list = objects.object_list
             for obj in object_list:
-                if obj.raw_label != label: continue
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
-                coordinated_target_list = np.vstack([coordinated_target_list, np.array(list(obj.position))])
+                if obj.position[2] > max_distance: continue  # Filter outliers by distance.
+                if obj.raw_label not in coordinate_dict:
+                    coordinate_dict[obj.raw_label] = np.empty((0,3))
+                coordinate_dict[obj.raw_label] = np.vstack([coordinate_dict[obj.raw_label], np.array(list(obj.position))])
 
             rd.write_history(object_list, label)
             
@@ -243,7 +245,7 @@ def object_detection(label: int, duration: int, opt):
     zed.disable_object_detection()
     zed.close()
 
-    return coordinated_target_list
+    return coordinate_dict
 
 def exec_detection(label: str,  opt, duration: int=15):
     object_detection(lab.get_label_id(label), duration, opt)
