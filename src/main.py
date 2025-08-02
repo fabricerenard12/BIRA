@@ -45,7 +45,7 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        coordinate_dict = detector.object_detection(label, 25, opt)
+        coordinate_dict = detector.object_detection(60, opt)
 
         if label not in coordinate_dict:
             raise ValueError(f"Label {label} not found in coordinate dictionary.")

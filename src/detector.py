@@ -107,7 +107,7 @@ def find_closest_object(new_position, object_dict, threshold):
         
         return closest_obj_id
 
-def object_detection(label: int, duration: int, opt) -> dict:
+def object_detection(duration: int, opt, label: int = -1) -> dict:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -279,4 +279,4 @@ def object_detection(label: int, duration: int, opt) -> dict:
     return coordinate_dict
 
 def exec_detection(label: str,  opt, duration: int=15):
-    object_detection(lab.get_label_id(label), duration, opt)
+    object_detection(duration, opt, lab.get_label_id(label))
