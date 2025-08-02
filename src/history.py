@@ -7,8 +7,6 @@ from datetime import datetime
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from cv_viewer import labels
-import os
-
 
 root = Path(__file__).resolve().parents[1]
 target = root / "logs"
@@ -28,7 +26,7 @@ class ObjectOutput:
 
 def write_json(obj_output) :
     target.mkdir(parents = True, exist_ok = True)
-    with open(filename, "a")  as                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            f :
+    with open(filename, "a") as f:
         f.write(str(obj_output.__dict__))
         f.write('\n')
         f.close()
