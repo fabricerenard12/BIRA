@@ -17,8 +17,8 @@ import time
 import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
-import outputs.retrieve_data as rd
-from algorithm import string_to_label 
+import history as rd
+from utils import string_to_label
 
 lock = Lock()
 run_signal = False
@@ -238,7 +238,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, 
                     next_object_id += 1
                     objects_dict[obj_id] = np.array([current_position])
 
-            rd.write_history(object_list, label)
+            rd.write_history(object_list)
             
             # -- Display
             # Retrieve display data
