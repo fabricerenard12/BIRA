@@ -17,13 +17,15 @@ import time
 import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
-import outputs.retrieve_data as rd
-from algorithm import string_to_label 
+import history as rd
+from utils import string_to_label 
 
 lock = Lock()
 run_signal = False
 exit_signal = False
 
+MAX_DISTANCE = 7.0
+PROXIMITY_THRESHOLD = 0.3
 
 def xywh2abcd(xywh, im_shape):
     output = np.zeros((4, 2))
@@ -110,7 +112,7 @@ def find_closest_object(new_position, label_type, coordinate_dict, label_to_ids,
         
         return closest_obj_id
 
-def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, proximity_threshold: float = 0.3) -> tuple[dict, dict]:
+def object_detection(duration: int, opt, label: int = -1) -> tuple[dict, dict]:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -225,13 +227,13 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, 
             for obj in object_list:
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
-                if obj.position[2] > max_distance: continue  # Filter outliers by distance.
+                if obj.position[2] > MAX_DISTANCE: continue  # Filter outliers by distance.
                 
                 current_position = np.array(list(obj.position))
                 
                 # Try to find an existing object of the same label within proximity threshold
                 closest_obj_id = find_closest_object(current_position, obj.raw_label, 
-                                                   coordinate_dict, label_to_ids, proximity_threshold)
+                                                   coordinate_dict, label_to_ids, PROXIMITY_THRESHOLD)
                 
                 if closest_obj_id is not None:
                     obj_id = closest_obj_id # Add to existing object
@@ -248,7 +250,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, 
                 # Add the position to the object's coordinate history
                 coordinate_dict[obj_id] = np.vstack([coordinate_dict[obj_id], current_position])
 
-            rd.write_history(object_list, label)
+            rd.write_history(object_list)
             
             # -- Display
             # Retrieve display data
