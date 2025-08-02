@@ -17,15 +17,13 @@ import time
 import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
-import history as rd
-from utils import string_to_label 
+import outputs.retrieve_data as rd
+from algorithm import string_to_label 
 
 lock = Lock()
 run_signal = False
 exit_signal = False
 
-MAX_DISTANCE = 7.0
-PROXIMITY_THRESHOLD = 0.3
 
 def xywh2abcd(xywh, im_shape):
     output = np.zeros((4, 2))
@@ -92,27 +90,22 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
             run_signal = False
         time.sleep(0.01)
 
-def find_closest_object(new_position, label_type, coordinate_dict, label_to_ids, threshold):
+def find_closest_object(new_position, object_dict, threshold):
         """Find the id of closest existing object of the same label within threshold distance"""
-        if label_type not in label_to_ids:
-            return None
-        
         min_distance = float('inf')
         closest_obj_id = None
-        
-        for obj_id in label_to_ids[label_type]:
-            if obj_id in coordinate_dict and len(coordinate_dict[obj_id]) > 0:
-                # Get the most recent position of this object
-                last_position = coordinate_dict[obj_id][-1]
+
+        for obj_id, positions in object_dict.items():
+            if len(positions) > 0:
+                last_position = positions[-1]
                 distance = np.linalg.norm(new_position - last_position)
-                
                 if distance < min_distance and distance <= threshold:
                     min_distance = distance
                     closest_obj_id = obj_id
         
         return closest_obj_id
 
-def object_detection(duration: int, opt, label: int = -1) -> tuple[dict, dict]:
+def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, proximity_threshold: float = 0.3) -> dict:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -197,7 +190,6 @@ def object_detection(duration: int, opt, label: int = -1) -> tuple[dict, dict]:
     timeout = time.time() + duration
 
     coordinate_dict = {}
-    label_to_ids = {}
     next_object_id = 0  # Counter for generating unique object IDs
     while viewer.is_available() and not exit_signal:
 
@@ -227,30 +219,26 @@ def object_detection(duration: int, opt, label: int = -1) -> tuple[dict, dict]:
             for obj in object_list:
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
-                if obj.position[2] > MAX_DISTANCE: continue  # Filter outliers by distance.
+                if obj.position[2] > max_distance: continue  # Filter outliers by distance.
                 
                 current_position = np.array(list(obj.position))
                 
-                # Try to find an existing object of the same label within proximity threshold
-                closest_obj_id = find_closest_object(current_position, obj.raw_label, 
-                                                   coordinate_dict, label_to_ids, PROXIMITY_THRESHOLD)
+                # Retrieve or initialize the dictionary for the current label
+                objects_dict = coordinate_dict.setdefault(obj.raw_label, {})
                 
-                if closest_obj_id is not None:
-                    obj_id = closest_obj_id # Add to existing object
-                else:
-                    obj_id = next_object_id # Create new object with unique ID
-                    next_object_id += 1
-                    coordinate_dict[obj_id] = np.empty((0,3))
-                    
-                    # Track which IDs belong to which labels
-                    if obj.raw_label not in label_to_ids:
-                        label_to_ids[obj.raw_label] = set()
-                    label_to_ids[obj.raw_label].add(obj_id)
-                
-                # Add the position to the object's coordinate history
-                coordinate_dict[obj_id] = np.vstack([coordinate_dict[obj_id], current_position])
+                # Find the closest object of the same label within the proximity threshold
+                closest_id = find_closest_object(current_position, objects_dict, proximity_threshold)
 
-            rd.write_history(object_list)
+                if closest_id is not None:
+                    # Append the position to the existing object's history
+                    objects_dict[closest_id] = np.vstack([objects_dict[closest_id], current_position])
+                else:
+                    # Create a new object with a unique ID and initialize its history
+                    obj_id = next_object_id
+                    next_object_id += 1
+                    objects_dict[obj_id] = np.array([current_position])
+
+            rd.write_history(object_list, label)
             
             # -- Display
             # Retrieve display data
@@ -286,7 +274,7 @@ def object_detection(duration: int, opt, label: int = -1) -> tuple[dict, dict]:
     zed.disable_object_detection()
     zed.close()
 
-    return coordinate_dict, label_to_ids
+    return coordinate_dict
 
 def exec_detection(label: str,  opt, duration: int=15):
     object_detection(lab.get_label_id(label), duration, opt)

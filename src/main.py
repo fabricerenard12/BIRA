@@ -44,15 +44,16 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        coordinate_dict, label_to_ids = detector.object_detection(25, opt)
-        if label not in label_to_ids:
-            raise ValueError(f"Label {label} not found in label to IDs mapping.")
+        coordinate_dict = detector.object_detection(label, 25, opt)
+
+        if label not in coordinate_dict:
+            raise ValueError(f"Label {label} not found in coordinate dictionary.")
         else:
-            for obj_id in label_to_ids[label]:
+            for obj_id, positions in coordinate_dict[label].items():
                 if obj_id not in coordinate_dict:
                     raise ValueError(f"Object ID {obj_id} with label {label} not found in coordinate dictionary.")
                 else:
-                    angle = find_angle(coordinate_dict[obj_id])
+                    angle = find_angle(positions)
                     print(f"Angle for object ID {obj_id} with label {label}: {angle}")
 
 if __name__ == '__main__':
