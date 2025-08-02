@@ -31,8 +31,7 @@ def find_angle(coordinated_target_list:np.ndarray, mode: Mode = Mode.FIX_THRESHO
     return angle_deg
 
 def main():
-    # text = speech_to_text.transcribe_directly()
-    text = "personne"
+    text = speech_to_text.transcribe_directly()
     print(text)
     label = utils.string_to_label(text)
     print(label)
@@ -45,7 +44,7 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        coordinated_target_list = detector.object_detection(label, 60, opt)
+        coordinated_target_list = detector.object_detection(label, 25, opt)
         angle = find_angle(coordinated_target_list)
         print("angle :", angle)
 
