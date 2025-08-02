@@ -2,7 +2,7 @@ import string
 
 HOLDABLE_OBJECT_LABELS = [24,26,27,29,32,35,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,58,62,64,65,66,67,73,74,75,76,77,79]
 
-LAB = {
+LABELS = {
     0: ('personne', 'person'),
     1: ('bicycle', 'bicyclette'),
     2: ('car', 'voiture'),
@@ -100,10 +100,10 @@ def string_to_label(sentence: str) -> int:
     labels = []
 
     for word in words:
-        for key, values in LAB.items():
+        for key, values in LABELS.items():
             if word in values:
                 labels.append(key)
-                print(f"Key of recognized object: {key} , {LAB[key]}")
+                print(f"Key of recognized object: {key} , {LABELS[key]}")
 
     if len(labels) != 1:
         print("Erreur, il y a", len(labels), "objets.")

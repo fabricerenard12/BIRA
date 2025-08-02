@@ -165,7 +165,6 @@ cython_debug/
 .vscode/
 
 ## Heka
-src/history.txt
 src/recording.wav
 logs/
 src/datasets
