@@ -93,7 +93,21 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
         time.sleep(0.01)
 
 def find_closest_object(new_position, object_dict, threshold):
-        """Find the id of closest existing object of the same label within threshold distance"""
+        """Find the id of closest existing object of the same label within threshold distance
+        
+        Find the ID of the closest existing object of the same label within a threshold distance.
+        This function calculates the Euclidean distance between a given position (`new_position`) 
+        and the last known position of each object in `object_dict`. It identifies the closest 
+        object whose distance is less than or equal to the specified `threshold`.
+        Args:
+            new_position (numpy.ndarray): The position of the new object as a NumPy array.
+            object_dict (dict): A dictionary where keys are object IDs and values are lists of 
+                positions (each position is a NumPy array) associated with the object.
+            threshold (float): The maximum distance within which an object is considered "close".
+        Returns:
+            int or None: The ID of the closest object if one is found within the threshold distance; 
+                otherwise, returns None.
+        """
         min_distance = float('inf')
         closest_obj_id = None
 
