@@ -168,3 +168,4 @@ cython_debug/
 src/history.txt
 src/recording.wav
 logs/
+src/datasets

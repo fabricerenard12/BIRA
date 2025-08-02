@@ -7,17 +7,17 @@ from datetime import datetime
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 from cv_viewer import labels
+import os
 
 
-root = Path(__file__).resolve().parents[2]
+root = Path(__file__).resolve().parents[1]
 target = root / "logs"
-target.mkdir(parents = True, exist_ok = True)
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-filename = f"logs/{timestamp}_historic.txt"
+filename = target / f"{timestamp}_history.txt"
 
 @dataclass
 class ObjectsOutput:
-    nObjects: str
+    nObjects: str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
     objects: list
 
 @dataclass
@@ -27,7 +27,8 @@ class ObjectOutput:
     dimensions: list # [width, height, length]
 
 def write_json(obj_output) :
-    with open(filename, "a")  as f :
+    target.mkdir(parents = True, exist_ok = True)
+    with open(filename, "a")  as                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            f :
         f.write(str(obj_output.__dict__))
         f.write('\n')
         f.close()
