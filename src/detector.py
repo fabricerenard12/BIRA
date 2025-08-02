@@ -24,6 +24,8 @@ lock = Lock()
 run_signal = False
 exit_signal = False
 
+MAX_DISTANCE: float = 7.0
+PROXIMITY_THRESHOLD: float = 0.3
 
 def xywh2abcd(xywh, im_shape):
     output = np.zeros((4, 2))
@@ -105,7 +107,7 @@ def find_closest_object(new_position, object_dict, threshold):
         
         return closest_obj_id
 
-def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, proximity_threshold: float = 0.3) -> dict:
+def object_detection(label: int, duration: int, opt) -> dict:
 
     global image_net, exit_signal, run_signal, detections
 
@@ -219,7 +221,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, 
             for obj in object_list:
                 if len(obj.bounding_box) == 0 : continue  
                 if np.isnan(obj.position).any(): continue
-                if obj.position[2] > max_distance: continue  # Filter outliers by distance.
+                if obj.position[2] > MAX_DISTANCE: continue  # Filter outliers by distance.
                 
                 current_position = np.array(list(obj.position))
                 
@@ -227,7 +229,7 @@ def object_detection(label: int, duration: int, opt, max_distance: float = 7.0, 
                 objects_dict = coordinate_dict.setdefault(obj.raw_label, {})
                 
                 # Find the closest object of the same label within the proximity threshold
-                closest_id = find_closest_object(current_position, objects_dict, proximity_threshold)
+                closest_id = find_closest_object(current_position, objects_dict, PROXIMITY_THRESHOLD)
 
                 if closest_id is not None:
                     # Append the position to the existing object's history
