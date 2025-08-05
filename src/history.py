@@ -31,11 +31,10 @@ def write_json(obj_output) :
         f.write('\n')
         f.close()
 
-def write_history(objects, target_label) :
+def write_history(objects) :
     objects_out = []
 
     for obj in objects:
-        if obj.raw_label != target_label: continue
         if len(obj.bounding_box) == 0 : continue  
         if np.isnan(obj.position).any(): continue
      

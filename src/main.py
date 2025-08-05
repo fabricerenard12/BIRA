@@ -33,6 +33,7 @@ def find_angle(coordinated_target_list:np.ndarray, mode: Mode = Mode.FIX_THRESHO
 def main():
     text = speech_to_text.transcribe_directly()
     print(text)
+    text = 'personne'
     label = utils.string_to_label(text)
     print(label)
 
@@ -44,12 +45,14 @@ def main():
     opt = parser.parse_args()
 
     with torch.no_grad():
-        coordinate_dict = detector.object_detection(label, 25, opt)
+        coordinate_dict = detector.object_detection(60, opt)
+
         if label not in coordinate_dict:
             raise ValueError(f"Label {label} not found in coordinate dictionary.")
         else:
-            angle = find_angle(coordinate_dict.get(label, np.empty((0, 3))))
-            print("angle :", angle)
+            for obj_id, positions in coordinate_dict[label].items():
+                angle = find_angle(positions)
+                print(f"Angle for object ID {obj_id} with label {label}: {angle}")
 
 if __name__ == '__main__':
     main()
