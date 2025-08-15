@@ -1,14 +1,14 @@
 from scipy.stats import trim_mean
 import speech_to_text
 import numpy as np
-import algorithm
-import outputs.retrieve_data as retrieve_data
+import utils
+import history as history
 import detector
 import argparse
 import torch
 import math
 import faulthandler
-import UART
+import uart
 from enum import Enum
 
 faulthandler.enable()
@@ -23,8 +23,8 @@ def find_angle(coordinated_target_list:np.ndarray, mode: Mode = Mode.FIX_THRESHO
         x = trim_mean(coordinated_target_list[:,0], proportiontocut=0.1)
         z = trim_mean(coordinated_target_list[:,2], proportiontocut=0.1)
     elif mode == Mode.FIX_THRESHOLD:
-        x = retrieve_data.get_distance(coordinated_target_list[:,0])
-        z = retrieve_data.get_distance(coordinated_target_list[:,2])
+        x = history.get_distance(coordinated_target_list[:,0])
+        z = history.get_distance(coordinated_target_list[:,2])
     
     angle_rad = math.atan(x / z)
     angle_deg = math.degrees(angle_rad)
@@ -50,9 +50,14 @@ def main():
         return
 
     with torch.no_grad():
-        coordinated_target_list = detector.object_detection(label, 25, opt)
-        angle = find_angle(coordinated_target_list)
-        print("angle :", angle)
+        coordinate_dict = detector.object_detection(60, opt)
+
+        if label not in coordinate_dict:
+            raise ValueError(f"Label {label} not found in coordinate dictionary.")
+        else:
+            for obj_id, positions in coordinate_dict[label].items():
+                angle = find_angle(positions)
+                print(f"Angle for object ID {obj_id} with label {label}: {angle}")
 
 if __name__ == '__main__':
     main()
