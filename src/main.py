@@ -65,11 +65,20 @@ def run_stt():
         text_queue.put({"text": f"Tu as dis: \n{text}", "countdown": 10})
         sleep(10)
 
-def run_bira_sequence(): 
+def run_bira_sequence(opt): 
     text = speech_to_text.transcribe_directly()
     print(text)
     label = utils.string_to_label(text)
     print(label)   
+    with torch.no_grad():
+        coordinate_dict = detector.object_detection(60, opt)
+
+        if label not in coordinate_dict:
+            raise ValueError(f"Label {label} not found in coordinate dictionary.")
+        else:
+            for obj_id, positions in coordinate_dict[label].items():
+                angle = find_angle(positions)
+                print(f"Angle for object ID {obj_id} with label {label}: {angle}")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -87,7 +96,7 @@ def main():
     elif opt.mode == "motors":
         run_test_motors()
     else:
-        run_bira_sequence()
+        run_bira_sequence(opt)
         
 if __name__ == '__main__':
     main()
