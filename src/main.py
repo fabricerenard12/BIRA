@@ -48,7 +48,7 @@ def run_test_motors():
                 print("Invalid input. Please enter numeric values.\n\n")           
 
 def run_stt():
-    def run_text_window(self, queue: multiprocessing.Queue):
+    def run_text_window(queue: multiprocessing.Queue):
         app = TextViewer(queue)
         app.open()
         
@@ -86,8 +86,8 @@ def main():
     parser.add_argument('--svo', type=str, default=None, help='optional svo file')
     parser.add_argument('--img_size', type=int, default=416, help='inference size (pixels)')
     parser.add_argument('--conf_thres', type=float, default=0.4, help='object confidence threshold')
-    parser.add_argument('--stt', type=str, default="", help='Run sheech to text app')
-    parser.add_argument('--motors', type=str, default="", help='Testing motors app')
+    parser.add_argument('--stt', action="store_true", help='Run sheech to text app')
+    parser.add_argument('--motors', help='Testing motors app')
     opt = parser.parse_args()
 
     if opt.stt:
