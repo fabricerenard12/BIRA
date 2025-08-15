@@ -46,7 +46,7 @@ def main():
         except ValueError:
             raise ValueError(f"Invalid value for --cv: {opt.cv}")
         with torch.no_grad():
-            coordinated_target_list = detector.object_detection(label, duration, opt)
+            coordinated_target_list = detector.object_detection(duration, opt)
         return
 
     with torch.no_grad():
