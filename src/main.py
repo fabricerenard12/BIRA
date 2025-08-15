@@ -86,14 +86,13 @@ def main():
     parser.add_argument('--svo', type=str, default=None, help='optional svo file')
     parser.add_argument('--img_size', type=int, default=416, help='inference size (pixels)')
     parser.add_argument('--conf_thres', type=float, default=0.4, help='object confidence threshold')
-    parser.add_argument('--mode', type=str, default="", help='')
+    parser.add_argument('--stt', type=str, default="", help='Run sheech to text app')
+    parser.add_argument('--motors', type=str, default="", help='Testing motors app')
     opt = parser.parse_args()
 
-    if opt.mode == "stt":
+    if opt.stt:
         run_stt()
-    elif opt.mode == "cv":
-        pass
-    elif opt.mode == "motors":
+    elif opt.motors:
         run_test_motors()
     else:
         run_bira_sequence(opt)
