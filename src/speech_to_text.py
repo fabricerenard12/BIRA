@@ -4,9 +4,10 @@ import wave
 import sys
 import tempfile
 from ctypes import *
+from consts import DEVICE
 
 # Load the Whisper model once
-model = whisper.load_model("small", device="cuda")
+model = whisper.load_model("small", device=DEVICE)
 
 # Records audio directly from the microphone until the user presses Enter 
 # and then transcribes it to text using Whisper, returning that transcription.
