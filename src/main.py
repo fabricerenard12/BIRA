@@ -86,7 +86,7 @@ def main():
     parser.add_argument('--svo', type=str, default=None, help='optional svo file')
     parser.add_argument('--img_size', type=int, default=416, help='inference size (pixels)')
     parser.add_argument('--conf_thres', type=float, default=0.4, help='object confidence threshold')
-    parser.add_argument('--stt', action="store_true", help='Run sheech to text app')
+    parser.add_argument('--stt', action="store_true", help='Run speech to text app')
     parser.add_argument('--motors', help='Testing motors app')
     opt = parser.parse_args()
 

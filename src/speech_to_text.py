@@ -63,7 +63,6 @@ def transcribe_directly():
 
     # And transcribe the audio to text (suppressing warnings about running on a CPU)
     result = model.transcribe('recording.wav', language="french")
-    #temp_file.close()
 
     return str(result["text"].strip())
 
@@ -122,7 +121,6 @@ def transcribe_for(seconds=5):
 
     # And transcribe the audio to text (suppressing warnings about running on a CPU)
     result = model.transcribe('recording.wav', language="french")
-    #temp_file.close()
 
     return str(result["text"].strip())
 
