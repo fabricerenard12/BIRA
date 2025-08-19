@@ -70,27 +70,28 @@ def run_bira_sequence(opt):
     print(text)
     label = utils.string_to_label(text)
     print(label)   
-    with torch.no_grad():
-        coordinate_dict = detector.object_detection(60, opt)
-
-        if label not in coordinate_dict:
-            raise ValueError(f"Label {label} not found in coordinate dictionary.")
-        else:
-            for obj_id, positions in coordinate_dict[label].items():
-                angle = find_angle(positions)
-                print(f"Angle for object ID {obj_id} with label {label}: {angle}")
-
+    
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='../models/yolov8n.pt', help='model.pt path(s)')
     parser.add_argument('--svo', type=str, default=None, help='optional svo file')
     parser.add_argument('--img_size', type=int, default=416, help='inference size (pixels)')
     parser.add_argument('--conf_thres', type=float, default=0.4, help='object confidence threshold')
+    parser.add_argument('--cv', type=str, default=None, help='Showcase cv abilities of BIRA for specified duration (use inf for infinity)')
     parser.add_argument('--stt', action="store_true", help='Run speech to text app')
     parser.add_argument('--motors', help='Testing motors app')
+
     opt = parser.parse_args()
 
-    if opt.stt:
+    if opt.cv is not None:
+        try:
+            duration = float('inf') if opt.cv.lower() == 'inf' else float(opt.cv)
+        except ValueError:
+            raise ValueError(f"Invalid value for --cv: {opt.cv}")
+        with torch.no_grad():
+            coordinated_target_list = detector.object_detection(duration, opt)
+        return
+    elif opt.stt:
         run_stt()
     elif opt.motors:
         run_test_motors()
