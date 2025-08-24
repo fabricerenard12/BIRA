@@ -169,14 +169,8 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
     camera_infos = zed.get_camera_information()
     camera_res = camera_infos.camera_configuration.resolution
 
-    # Create OpenGL viewer
-    point_cloud_res = sl.Resolution(min(camera_res.width, 720), min(camera_res.height, 404))
-    point_cloud_render = sl.Mat()
-    point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4,
-                         sl.MEM.CPU)
-    image_left = sl.Mat()
-
     # Utilities for 2D display
+    image_left = sl.Mat()
     display_resolution = sl.Resolution(min(camera_res.width, 1280), min(camera_res.height, 720))
     image_scale = [display_resolution.width / camera_res.width,
                    display_resolution.height / camera_res.height]
@@ -251,8 +245,6 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
             
             # -- Display
             # Retrieve display data
-            zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA, sl.MEM.CPU, point_cloud_res)
-            point_cloud.copy_to(point_cloud_render)
             zed.retrieve_image(image_left, sl.VIEW.LEFT, sl.MEM.CPU, display_resolution)
             zed.get_position(cam_w_pose, sl.REFERENCE_FRAME.WORLD)
 
@@ -260,7 +252,7 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
             np.copyto(image_left_ocv, image_left.get_data())
             cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking, label)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
-            cv2.imshow("ZED | 2D View and Birds View", global_image)
+            cv2.imshow("BIRA - Computer Vision", global_image)
             
             key = cv2.waitKey(10)
             if key == 27 or time.time() > timeout:
@@ -269,7 +261,6 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
         else:
             exit_signal = True
     
-    point_cloud.free()
     image_left.free()
     exit_signal = True
     zed.disable_object_detection()
