@@ -2,19 +2,14 @@
 
 from ultralytics import YOLO
 from threading import Lock, Thread
-from scipy.stats import trim_mean
 
-import argparse
-import sys
 import numpy as np
-
-import torch
+import time
 import cv2
+
 import pyzed.sl as sl
 
-import time
 
-import ogl_viewer.viewer as gl
 import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
 import history as rd
@@ -175,10 +170,8 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
     camera_res = camera_infos.camera_configuration.resolution
 
     # Create OpenGL viewer
-    viewer = gl.GLViewer()
     point_cloud_res = sl.Resolution(min(camera_res.width, 720), min(camera_res.height, 404))
     point_cloud_render = sl.Mat()
-    viewer.init(camera_infos.camera_model, point_cloud_res, obj_param.enable_tracking)
     point_cloud = sl.Mat(point_cloud_res.width, point_cloud_res.height, sl.MAT_TYPE.F32_C4,
                          sl.MEM.CPU)
     image_left = sl.Mat()
@@ -207,7 +200,7 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
 
     coordinate_dict = {}
     next_object_id = 0  # Counter for generating unique object IDs
-    while viewer.is_available() and not exit_signal:
+    while not exit_signal:
 
         if zed.grab(runtime_params) == sl.ERROR_CODE.SUCCESS:
 
@@ -265,25 +258,17 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
 
             # 2D rendering
             np.copyto(image_left_ocv, image_left.get_data())
-            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking,
-                                label)
+            cv_viewer.render_2D(image_left_ocv, image_scale, objects, obj_param.enable_tracking, label)
             global_image = cv2.hconcat([image_left_ocv, image_track_ocv])
-
-            # Tracking view
-            # track_view_generator.generate_view(objects, cam_w_pose, image_track_ocv,
-            # objects.is_tracked)
-
             cv2.imshow("ZED | 2D View and Birds View", global_image)
+            
             key = cv2.waitKey(10)
+            if key == 27 or time.time() > timeout:
+                exit_signal = True
 
-            if key == 27 :
-                exit_signal = True
-            elif time.time() > timeout:
-                exit_signal = True
         else:
             exit_signal = True
     
-    viewer.exit()
     point_cloud.free()
     image_left.free()
     exit_signal = True
