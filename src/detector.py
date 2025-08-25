@@ -255,7 +255,8 @@ def object_detection(duration: int, opt, label: int = -1) -> dict:
             cv2.imshow("BIRA - Computer Vision", global_image)
             
             key = cv2.waitKey(10)
-            if key == 27 or time.time() > timeout:
+            current_time = time.time()
+            if key == 27 or current_time > timeout:
                 exit_signal = True
 
         else:
