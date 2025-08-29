@@ -14,7 +14,6 @@ import cv_viewer.tracking_viewer as cv_viewer
 import cv_viewer.labels as lab
 import history as rd
 from utils import string_to_label
-from consts import DEVICE
 
 lock = Lock()
 run_signal = False
@@ -70,7 +69,7 @@ def torch_thread(weights, img_size, conf_thres=0.2, iou_thres=0.45):
     print("Intializing Network...")
 
     yolo = YOLO(weights)
-    yolo.model.to(DEVICE)
+    yolo.model.to('cuda')
     yolo.model.eval()
 
     while not exit_signal:
